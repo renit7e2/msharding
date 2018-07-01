@@ -1,0 +1,13 @@
+CREATE TABLE IF NOT EXISTS `t_sharding_router` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `table_name` varchar(50) NOT NULL COMMENT '表名',
+  `table_strategy` varchar(50) NOT NULL COMMENT '分表策略',
+  `sharding_param` varchar(100) NOT NULL COMMENT '分片参数(json形式)',
+  `table_regex` varchar(50) NOT NULL COMMENT '分表正则表达式',
+  `order` tinyint(4) NOT NULL COMMENT '分表算法优先级（数字越小优先级越高）',
+  `enable` tinyint(4) NOT NULL DEFAULT '1' COMMENT '是否生效：0无效，1有效',
+  `create_time` datetime NOT NULL,
+  `update_time` datetime NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_sharding` (`table_name`,`table_strategy`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='分片路由表';
