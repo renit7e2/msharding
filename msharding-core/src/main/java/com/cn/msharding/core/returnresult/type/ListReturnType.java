@@ -1,4 +1,4 @@
-package com.cn.msharding.core.returntype;
+package com.cn.msharding.core.returnresult.type;
 
 import java.util.ArrayList;
 import java.util.List;

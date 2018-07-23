@@ -50,4 +50,35 @@ public class ThreadPoolUtil {
         };
         return executor.submit(callable);
     }
+
+    /**
+     * {@link #asyncCall(ExecutorService, Object, Async, Callback)}
+     */
+    public static <V1, T, V0> V1 asyncCall(final T t, final Async<V0, T> asyncThread, Callback<V0, V1> callback) {
+        V0 result = AsyncResultUtil.getResult(asyncCall(t, asyncThread));
+        if (callback != null) {
+            return callback.callBack(result);
+        }
+        return null;
+    }
+
+    /**
+     * 异步调用&&回调
+     *
+     * @param executor    线程池
+     * @param t           请求参数
+     * @param asyncThread 线程执行接口
+     * @param callback    回调函数
+     * @param <V1>        回调返回泛型
+     * @param <T>         请求参数泛型
+     * @param <V0>        线程返回结果泛型
+     * @return
+     */
+    public static <V1, T, V0> V1 asyncCall(ExecutorService executor, final T t, final Async<V0, T> asyncThread, Callback<V0, V1> callback) {
+        V0 result = AsyncResultUtil.getResult(asyncCall(executor, t, asyncThread));
+        if (callback != null) {
+            return callback.callBack(result);
+        }
+        return null;
+    }
 }

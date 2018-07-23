@@ -154,6 +154,6 @@ public class StatementInterceptorProcessor implements ShardingInterceptorProcess
             realTableNames.add((String) chooseResult);
             return realTableNames;
         }
-        throw new ShardingRunException("illegal sharding strategy returntype type,strategy=" + tableChooseStrategy.getClass().getSimpleName());
+        throw new ShardingRunException("illegal sharding strategy returnresult type,strategy=" + tableChooseStrategy.getClass().getSimpleName());
     }
 }

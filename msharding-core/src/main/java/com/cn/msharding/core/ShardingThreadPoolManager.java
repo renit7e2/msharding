@@ -3,13 +3,13 @@ package com.cn.msharding.core;
 import com.cn.msharding.common.exception.ShardingRunException;
 import com.cn.msharding.common.util.AssertUtil;
 import com.cn.msharding.common.util.async.Async;
+import com.cn.msharding.common.util.async.AsyncResultUtil;
 import com.cn.msharding.common.util.async.ThreadPoolUtil;
 import com.cn.msharding.core.constant.ShardingConstant;
-import com.cn.msharding.core.returntype.ReturnTypeManager;
+import com.cn.msharding.core.returnresult.merge.ReturnMergeDispatcher;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.ibatis.executor.statement.StatementHandler;
 import org.apache.ibatis.plugin.Invocation;
 
@@ -88,34 +88,8 @@ public class ShardingThreadPoolManager {
                 });
                 futures.add(future);
             }
-            boolean isTypeChange = false;
-            List<Object> exeResults = new ArrayList<>();
-            for (Future<Object> future : futures) {
-                Object o = future.get();
-                if ((!clazzType.isAssignableFrom(List.class) && !clazzType.equals(List.class) && o instanceof List)) {
-                    List _list = (List) o;
-                    if (!clazzType.isPrimitive() && !clazzType.isAssignableFrom(Number.class)) {
-                        if (CollectionUtils.isEmpty(_list)) {
-                            continue;
-                        }
-                        return _list;
-                    }
-                    exeResults.add((_list).get(0));
-                    isTypeChange = true;
-                    continue;
-                }
-                exeResults.add(o);
-            }
-            if (exeResults.isEmpty()) {
-                return exeResults;
-            }
-            T t = (T) ReturnTypeManager.getInstance().getReturnType(clazzType).convert(exeResults);
-            if (isTypeChange) {
-                List<T> res = new ArrayList<>();
-                res.add(t);
-                return res;
-            }
-            return t;
+
+            return ReturnMergeDispatcher.getInstance().merge(AsyncResultUtil.getResultList(futures), clazzType);
         } catch (Exception e) {
             log.error("sharding mybatis invoke exception", e);
             throw new ShardingRunException("sharding mybatis invoke exception", e);
